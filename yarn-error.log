@@ -1,0 +1,84 @@
+Arguments: 
+  /snap/node/7065/bin/node /snap/node/7065/bin/yarn.js global dir
+
+PATH: 
+  /home/siyum/npm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.13.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: package.json: EACCES: permission denied, write
+      at writeSync (node:fs:933:3)
+      at SyncWriteStream._write (node:internal/fs/sync_write_stream:26:3)
+      at writeOrBuffer (node:internal/streams/writable:392:12)
+      at _write (node:internal/streams/writable:333:10)
+      at Writable.write (node:internal/streams/writable:337:10)
+      at ConsoleReporter.warn (/snap/node/7065/lib/cli.js:92855:17)
+      at warn (/snap/node/7065/lib/cli.js:51326:23)
+      at module.exports.exports.default (/snap/node/7065/lib/cli.js:37409:7)
+      at /snap/node/7065/lib/cli.js:51337:51
+      at Generator.next (<anonymous>)
+
+npm manifest: 
+  {
+    "name": "apium-code",
+    "displayName": "apium-code",
+    "description": "AI code generator",
+    "version": "0.0.1",
+    "engines": {
+      "vscode": "^1.74.0"
+    },
+    "categories": [
+      "Other"
+    ],
+    "activationEvents": [
+      "onCommand:apium-code.helloWorld"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+      "commands": [
+        {
+          "command": "apium-code.helloWorld",
+          "title": "Hello World"
+        }
+      ]
+    },
+    "scripts": {
+      "vscode:prepublish": "npm run compile",
+      "compile": "tsc -p ./",
+      "watch": "tsc -watch -p ./",
+      "pretest": "npm run compile && npm run lint",
+      "lint": "eslint src --ext ts",
+      "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+      "@types/glob": "^8.0.0",
+      "@types/mocha": "^10.0.1",
+      "@types/node": "16.x",
+      "@types/vscode": "^1.74.0",
+      "@typescript-eslint/eslint-plugin": "^5.45.0",
+      "@typescript-eslint/parser": "^5.45.0",
+      "@vscode/test-electron": "^2.2.0",
+      "eslint": "^8.28.0",
+      "glob": "^8.0.3",
+      "mocha": "^10.1.0",
+      "typescript": "^4.9.3"
+    },
+    "dependencies": {
+      "dotenv": "^16.0.3",
+      "openai": "^3.1.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
