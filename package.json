@@ -10,7 +10,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:apium-code.helloWorld"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
