@@ -2,16 +2,13 @@ import * as vscode from "vscode";
 import { fetchCodeCompletions } from "./util/generateCode";
 import CSConfig from "./config";
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log("I am running");
 
   const provider: vscode.CompletionItemProvider = {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     provideInlineCompletionItems: async (document, position) => {
-      console.log(position, "position");
-
-      // vscode.comments.createCommentController
       const textBeforeCursor = document.getText();
       if (textBeforeCursor.trim() === "") {
         return { items: [] };
@@ -28,9 +25,10 @@ export function activate(context: vscode.ExtensionContext) {
         currLineBeforeCursor.trim() === ""
       ) {
         let rs;
-
+        setTimeout(() => {
+          vscode.window.setStatusBarMessage("Generating code, please wait...");
+        }, 1000);
         try {
-          // Fetch the code completion based on the text in the user's document
           rs = await fetchCodeCompletions(textBeforeCursor);
         } catch (err) {
           if (err instanceof Error) {
@@ -45,7 +43,11 @@ export function activate(context: vscode.ExtensionContext) {
 
         // Add the generated code to the inline suggestion list
         const items: any[] = [];
+        console.log("Adding code snippets inline");
+
         for (let i = 0; i < rs.completions.length; i++) {
+          console.log("adding", rs.completions[i]);
+
           items.push({
             insertText: rs.completions[i],
             range: new vscode.Range(
@@ -55,6 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
             trackingId: `snippet-${i}`,
           });
         }
+        vscode.window.setStatusBarMessage("Code generated successfully!");
+
         return { items };
       }
       return { items: [] };
