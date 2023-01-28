@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { fetchCodeCompletions } from "./util/generateCode";
 import CSConfig from "./config";
 
+
 export async function activate(context: vscode.ExtensionContext) {
   console.log("I am running");
 
@@ -71,6 +72,7 @@ export async function activate(context: vscode.ExtensionContext) {
     { pattern: "**" },
     provider
   );
+
 }
 
 export function deactivate() {}
