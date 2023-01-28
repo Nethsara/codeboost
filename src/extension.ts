@@ -1,60 +1,78 @@
 import * as vscode from "vscode";
-import { Configuration, OpenAIApi } from "openai";
+import { fetchCodeCompletions } from "./util/generateCode";
+import CSConfig from "./config";
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
-const openai = new OpenAIApi(configuration);
+export async function activate(context: vscode.ExtensionContext) {
+  console.log("I am running");
 
-export function activate(context: vscode.ExtensionContext) {
-  let disposable = vscode.workspace.onDidChangeTextDocument(async (event) => {
-    let editor = vscode.window.activeTextEditor;
-    if (editor) {
-      let doc = editor.document;
-      let text = doc.getText();
-      let line = editor.selection.active.line;
-      let language =
-        editor.document.languageId === "plaintext"
-          ? ""
-          : editor.document.languageId;
+  const provider: vscode.CompletionItemProvider = {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    provideInlineCompletionItems: async (document, position) => {
+      const textBeforeCursor = document.getText();
+      if (textBeforeCursor.trim() === "") {
+        return { items: [] };
+      }
+      const currLineBeforeCursor = document.getText(
+        new vscode.Range(position.with(undefined, 0), position)
+      );
 
-      if (text.includes("??")) {
-        let lineText = editor.document.lineAt(line).text.replace("??", "");
-
-        console.log(lineText);
-        const start = new vscode.Position(line, 0);
-        const end = new vscode.Position(line, lineText.length + 2);
-        const range = new vscode.Range(start, end);
-
-        console.log(end);
-
+      // Check if user's state meets one of the trigger criteria
+      if (
+        CSConfig.SEARCH_PHARSE_END.includes(
+          textBeforeCursor[textBeforeCursor.length - 1]
+        ) ||
+        currLineBeforeCursor.trim() === ""
+      ) {
+        let rs;
         setTimeout(() => {
           vscode.window.setStatusBarMessage("Generating code, please wait...");
         }, 1000);
+        try {
+          rs = await fetchCodeCompletions(textBeforeCursor);
+        } catch (err) {
+          if (err instanceof Error) {
+            vscode.window.showErrorMessage(err.toString());
+          }
+          return { items: [] };
+        }
 
-        const response = await openai.createCompletion({
-          model: process.env.model,
-          prompt: `${lineText} in ${language}`,
-          max_tokens: parseInt(process.env.max_tokens),
-          temperature: parseInt(process.env.temperature),
-        });
+        if (rs === null) {
+          return { items: [] };
+        }
 
-        let code = response.data.choices[0].text.trimStart();
-        code = code.replace("??", "");
+        // Add the generated code to the inline suggestion list
+        const items: any[] = [];
+        console.log("Adding code snippets inline");
 
-        console.log(code);
+        for (let i = 0; i < rs.completions.length; i++) {
+          console.log("adding", rs.completions[i]);
 
-        editor.edit((edit) => {
-          edit.replace(range, code);
-        });
-
+          items.push({
+            insertText: rs.completions[i],
+            range: new vscode.Range(
+              position.translate(0, rs.completions.length),
+              position
+            ),
+            trackingId: `snippet-${i}`,
+          });
+        }
         vscode.window.setStatusBarMessage("Code generated successfully!");
-      }
-    }
-  });
 
-  context.subscriptions.push(disposable);
+        return { items };
+      }
+      return { items: [] };
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  vscode.languages.registerInlineCompletionItemProvider(
+    { pattern: "**" },
+    provider
+  );
+
 }
 
 export function deactivate() {}
