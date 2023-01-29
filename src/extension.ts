@@ -4,8 +4,6 @@ import CSConfig from "./config";
 
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log("I am running");
-
   const provider: vscode.CompletionItemProvider = {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -29,7 +27,7 @@ export async function activate(context: vscode.ExtensionContext) {
         setTimeout(() => {
           vscode.window.setStatusBarMessage("Generating code, please wait...");
         }, 1000);
-        try {
+        try {          
           rs = await fetchCodeCompletions(textBeforeCursor);
         } catch (err) {
           if (err instanceof Error) {
@@ -44,11 +42,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
         // Add the generated code to the inline suggestion list
         const items: any[] = [];
-        console.log("Adding code snippets inline");
 
         for (let i = 0; i < rs.completions.length; i++) {
-          console.log("adding", rs.completions[i]);
-
           items.push({
             insertText: rs.completions[i],
             range: new vscode.Range(
