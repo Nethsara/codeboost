@@ -1,8 +1,9 @@
 {
-  "name": "apium-code",
-  "displayName": "apium-code",
-  "description": "AI code generator",
+  "name": "codeboost",
+  "displayName": "Code Boost",
+  "description": "AI Inline Code Completion Tool",
   "version": "0.0.1",
+  "publisher": "Siyum",
   "engines": {
     "vscode": "^1.74.0"
   },
