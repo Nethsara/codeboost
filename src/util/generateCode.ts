@@ -6,6 +6,8 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export async function fetchCodeCompletions(prompt: string) {
+  console.log("generating");
+
   try {
     const response = await openai.createCompletion({
       model: process.env.model,
